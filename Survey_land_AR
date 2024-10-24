@@ -1,0 +1,129 @@
+//VIRTUAL BUTTON – DEMO and MEASURE 
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+public class sceneScript : MonoBehaviour
+{
+     public string sceneName;
+     public string sceneName1;
+    public void NextScene(){
+      SceneManager.LoadScene(sceneName);
+   }
+    public void NextScene1(){
+      SceneManager.LoadScene(sceneName1);
+   }
+}
+
+ VIRTUAL BUTTON  -BACK ,OUTPUT 1, AND OUTPUT 2
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+public class GOback : MonoBehaviour
+{
+    public string Previousscene;
+      public void PreviousScene(){
+      SceneManager.LoadScene(Previousscene);
+   }
+}
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+public class ScreenScript : MonoBehaviour
+{
+     public string sceneName;
+    public void NextScene(){
+      SceneManager.LoadScene(sceneName);
+   }
+}
+
+
+
+
+
+VISUAL SCRIPTING CANVAS
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit.AR;
+using TMPro;
+
+public class LineManager : MonoBehaviour
+{
+    public LineRenderer lineRenderer;
+    public ARPlacementInteractable placementInteractable;
+    public TextMeshPro mText;
+    private int pointCount = 0;
+    LineRenderer line;
+    public bool continuous;
+    public TextMeshProUGUI buttonText;
+
+    void Start()
+    {
+        placementInteractable.objectPlaced.AddListener(DrawLine);
+    }
+
+    public void ToggleBetweenDiscreteAndContinuous()
+    {
+        continuous = !continuous;
+        if (continuous)
+        {
+            buttonText.text = "Discrete";
+        }
+        else
+        {
+            buttonText.text = "Continuous";
+        }
+    }
+
+    void DrawLine(ARObjectPlacementEventArgs args)
+    {
+        pointCount++;
+
+        if (pointCount < 2)
+        {
+            line = Instantiate(lineRenderer);
+            line.positionCount = 1;
+        }
+        else
+        {
+            line.positionCount = pointCount;
+            if (!continuous)
+                pointCount = 0;
+        }
+
+        line.SetPosition(line.positionCount - 1, args.placementObject.transform.position);
+
+        if (line.positionCount > 1)
+        {
+            Vector3 startPoint = line.GetPosition(line.positionCount - 1);
+            Vector3 endPoint = line.GetPosition(line.positionCount - 2);
+            float dist = Vector3.Distance(startPoint, endPoint);
+
+            TextMeshPro distText = Instantiate(mText);
+            distText.text = "" + dist;
+
+            Vector3 directionVector = endPoint - startPoint;
+            Vector3 normal = args.placementObject.transform.up;
+
+            Vector3 upDir = Vector3.Cross(directionVector, normal).normalized;
+            Quaternion rotation = Quaternion.LookRotation(-normal, upDir);
+
+            distText.transform.rotation = rotation;
+            distText.transform.position = startPoint + directionVector * 0.5f + upDir * 0.2f;
+        }
+    }
+}
+
+
+
+
+
+
+
+
